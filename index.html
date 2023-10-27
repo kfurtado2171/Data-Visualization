@@ -113,6 +113,15 @@
                     .attr("width", width)
                     .attr("height", height);
 
+                // Add a figure title
+                svg.append("text")
+                    .text("1980 Population per Town")
+                    .attr("x", width / 2)
+                    .attr("y", margin / 2)
+                    .attr("text-anchor", "middle")
+                    .attr("font-size", "18px")
+                    .attr("font-weight", "bold");
+
             /*-------------------------------------------------------*/
             /*-----------------Topojson data handling----------------*/
             /*-------------------------------------------------------*/
@@ -175,7 +184,7 @@
                     tooltip.transition()
                         .duration(200)
                         .style("opacity", .9)
-                    tooltip.html(d['properties']['TOWN'] + " POPULATION: " + d['properties']['POP1980'])
+                    tooltip.html(d['properties']['TOWN'] + " POPULATION 1980: " + d['properties']['POP1980'])
                         .style("left", m.clientX + "px")
                         .style("top", m.clientY + "px");
                 })
@@ -195,6 +204,15 @@
                 const svg = d3.select(containerName).append("svg")
                     .attr("width", width)
                     .attr("height", height);
+
+                // Add a figure title
+                svg.append("text")
+                    .text("2000-2010 Population Change per Town")
+                    .attr("x", width / 2)
+                    .attr("y", margin / 2)
+                    .attr("text-anchor", "middle")
+                    .attr("font-size", "18px")
+                    .attr("font-weight", "bold");
 
                 /*-------------------------------------------------------*/
                 /*-----------------Topojson data handling----------------*/
@@ -258,7 +276,7 @@
                         tooltip.transition()
                             .duration(200)
                             .style("opacity", .9)
-                        tooltip.html(d['properties']['TOWN'] + " POPULATION CHANGE: " + d['properties']['POPCH00_10'])
+                        tooltip.html(d['properties']['TOWN'] + " POPULATION CHANGE 2000-2010: " + d['properties']['POPCH00_10'])
                             .style("left", m.clientX + "px")
                             .style("top", m.clientY + "px");
                     })
@@ -277,6 +295,15 @@
                 const svg = d3.select(containerName).append("svg")
                     .attr("width", width)
                     .attr("height", height);
+
+                // Add a figure title
+                svg.append("text")
+                    .text("2000-2010 Population Change per County")
+                    .attr("x", width / 2)
+                    .attr("y", margin / 2)
+                    .attr("text-anchor", "middle")
+                    .attr("font-size", "18px")
+                    .attr("font-weight", "bold");
 
                 /*-------------------------------------------------------*/
                 /*-----------------Topojson data handling----------------*/
@@ -345,9 +372,16 @@
                     { "county": "Suffolk County", "fips_code": 25025 },
                     { "county": "Worcester County", "fips_code": 25027 } ];
 
+                // Convert FIPS Code to County Name
                 function convertFIPSToName(fipsCode) {
                     const countyObject = countyConversions.find(item => item.fips_code === fipsCode);
                     return countyObject.county;
+                }
+
+                // Calculate Population Change from 2000-2010 for County
+                function calculateCountyPopulationChange(countyId) {
+                    const townsInCounty = geojson.features.filter((feature) => feature.properties.FIPS_STCO === countyId);
+                    return townsInCounty.reduce((total, town) => total + town.properties.POPCH00_10, 0);
                 }
 
                 svg.selectAll("path")
@@ -362,7 +396,7 @@
                         tooltip.transition()
                             .duration(200)
                             .style("opacity", .9)
-                        tooltip.html(convertFIPSToName(d['properties']['FIPS_STCO']))
+                        tooltip.html(convertFIPSToName(d['properties']['FIPS_STCO']) + " Population Change 2000-2010: " + calculateCountyPopulationChange(d['properties']['FIPS_STCO']))
                             .style("left", m.clientX + "px")
                             .style("top", m.clientY + "px");
                     })

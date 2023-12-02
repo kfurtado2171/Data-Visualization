@@ -33,19 +33,6 @@
             height: 75vh;
         }
 
-        #time {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            font-family: sans-serif;
-            font-size: 12pt;
-        }
-
-        .legend_text {
-            font-family: sans-serif;
-            font-size: 5pt;
-        }
-
         #slider-range {
             margin-bottom: 20px;
         }
@@ -54,28 +41,7 @@
             text-align: center;
         }
     </style>
-
-
-
 </head>
-
-
-<script>
-    // $( function() {
-    //     $( "#slider-range" ).slider({
-    //         range: true,
-    //         min: 0,
-    //         max: 3000,
-    //         values: [ 0, 3000 ],
-    //         slide: function( event, ui ) {
-    //             $( "#amount" ).val(ui.values[ 0 ] + " - " + ui.values[ 1 ] );
-    //         }
-    //     });
-    //     $( "#amount" ).val($( "#slider-range" ).slider( "values", 0 ) +
-    //         " - " + $( "#slider-range" ).slider( "values", 1 ) );
-    // } );
-</script>
-
 
 <body>
 <div id="content">
@@ -96,40 +62,29 @@
 
 
 <script>
-
-    //const timeSeries = `time_series/temperature_${0}.csv`; //  abstracted data file
     let svg = d3.select("svg");
-    // min max temperature read during 2018
-    //const min =0;
-    //const max = 1200;
-    const bin_counts = 100;
-    // path generator
-    const path = d3.geoPath();
+    const bin_counts = 100; // step size
 
+    const path = d3.geoPath(); // path generator
 
     function update_visualization(min, max, m, n, values_T){
         d3.select('g').remove()
 
-        /////////////////COLOR CODING/////////////////////////////
+        // color coding
         let colors = d3.scaleLinear()
             .domain(d3.range(min,max,
                 parseInt(Math.abs(max-min)/6.5)))
             .range(["#0d1a50", "#3e5eba", "#2b83ba",
                 "#abdda4", "#ffffbf", "#fdae61", "#d7191c"])
             .interpolate(d3.interpolateHcl);
-        // const colors = d3.scaleDiverging()
-        //     .domain([min, (max+min)/2, max])
-        //     .interpolator(d3.interpolateRdBu);
 
-        ////////////////////////////////////////////////////////////
-
-        // Step 3 contour generator
+        // contour generator
         const contours = d3.contours()
             .size([m, n])
             .thresholds(d3.range(min,max,bin_counts))
             (values_T);
 
-        // Step 3 append contour to path (d)
+        // append contour to path (d)
         svg.append("g").attr("class","contours")
             .selectAll("path")
             .data(contours)
@@ -145,21 +100,19 @@
                 })
     }
 
-
     function plot_contour(fileName)
     {
-        // Step 1 read csv file
+        // read csv file
         d3.csv(fileName).then(function (data)
         {
             // data dimensions
             let m= 512, n= 512;
 
-            // Step 2 convert data into 1D list
+            // convert data into 1D list
             let values_T= [];
             data.forEach(function (d) {
                 values_T.push(+d[0])
             });
-            //console.log(values_T)
 
             let min_total = values_T[0];
             let max_total = values_T[0];
@@ -171,14 +124,13 @@
                     max_total = values_T[i]
                 }
             }
-            //console.log("min: " + min)
-            //console.log("max: " + max)
 
             let min = min_total;
             let max = max_total;
 
             update_visualization(min, max, m, n, values_T)
 
+            // slider from https://jqueryui.com/slider/
             $( function() {
                 $( "#slider-range" ).slider({
                     range: true,
@@ -197,9 +149,9 @@
             });
         })
     }
+
     let filename = `data/Data_CT.csv`;
     plot_contour(filename)
-
 </script>
 </body>
 </html>
